@@ -7,69 +7,71 @@
 //
 
 #include <iostream>
-#include <memory>
-#include <algorithm>
-#include <climits>
+#include <vector>
 
-class TreeNode{
-public:
-    
-    int val;
-    std::unique_ptr<TreeNode> left;
-    std::unique_ptr<TreeNode> right;
-
-    TreeNode(int val = 0, std::unique_ptr<TreeNode> left = nullptr, std::unique_ptr<TreeNode> right = nullptr)
-        : val(val), left(std::move(left)), right(std::move(right)) {}
-    
-};
-
-
-class VU_Ex4{
+class NO_ex5 {
 private:
-    int dfs(const std::unique_ptr<TreeNode>& node, int current_sum){
-        if (!node) {
-            return 0;
+    int n, k;
+    std::vector<std::vector<int>> graph_matrix;
+    std::vector<int> colour;
+    
+    bool checker(int v, int c) {
+        for (int i = 0; i < n; i++) {
+            if (graph_matrix[v][i] == 1 && colour[i] == c) {
+                return false;
+            }
         }
-        
-        current_sum = current_sum * 10 + node->val;
+        return true;
+    }
+    
+    bool solver(int v) {
+        if (v == n) return true;
 
-        if (!node->left && !node->right) {
-            return current_sum;
+        for (int c = 1; c <= k; c++) {
+            if (checker(v, c)) {
+                colour[v] = c;
+                if (solver(v + 1)) {
+                    return true;
+                }
+                colour[v] = 0;
+            }
         }
-
-        return dfs(node->left, current_sum) + dfs(node->right, current_sum);
+        return false;
     }
     
 public:
-    int summer(const std::unique_ptr<TreeNode>& root){
-        return dfs(root, 0);
+    NO_ex5(int n_vertexes, int k_colours)
+    : n(n_vertexes), k(k_colours), graph_matrix(n, std::vector<int>(n)), colour(n, 0) {}
+    
+    void nine_k_in_one(){
+        for (int i = 0; i < n; i++) {
+            std::string row;
+            std::cin >> row;
+            for (int j = 0; j < n; j++) {
+                graph_matrix[i][j] = row[j] - '0';
+            }
+        }
+
+        if (solver(0)) {
+            std::cout << "\nYES\n";
+            for (int i = 0; i < n; i++) {
+                std::cout << colour[i] << (i == n - 1 ? "" : " ");
+            }
+            std::cout << "\n";
+        } else {
+            std::cout << "\nNO\n";
+        }
     }
     
 };
 
+int main(){
 
-int main(int argc, const char * argv[]) {
-    
-    VU_Ex4 ex4;
-    
-    // no.1;
-    auto tree1 = std::make_unique<TreeNode>(1,
-            std::make_unique<TreeNode>(3),      std::make_unique<TreeNode>(5) );
-    
-    //
-    std::cout << ex4.summer(tree1) << std::endl << std::endl;
-    
-    std::cout << "/////////////////" << std::endl << std::endl;
-    
-    // no.2;
-    auto tree2 = std::make_unique<TreeNode>(1,
-    std::make_unique<TreeNode>(2),      std::make_unique<TreeNode>(3,
-                    std::make_unique<TreeNode>(2),      std::make_unique<TreeNode>(1)) );
-    
-    //
-    std::cout << ex4.summer(tree2) << std::endl << std::endl;
-    
-    std::cout << "/////////////////" << std::endl << std::endl;
+    int n, k;
+    std::cout << ": "; std::cin >> n >> k;
+
+    NO_ex5 spinner(n, k);
+    spinner.nine_k_in_one();
     
     return 0;
 }

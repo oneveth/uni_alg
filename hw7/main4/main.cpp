@@ -8,38 +8,37 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
-long long ex2(int n){
+int swans_greed(int x, int k, std::vector<int> arr){
+    std::sort(arr.begin(), arr.end(), std::greater<int>());
     
-    if (n > 20) {
-        std::cout << n << " больше 20: ";
-        return -1;
-    }
+    int output = 0;
     
-    std::vector<long long> arr(n + 1, 0);
-    
-    arr[0] = 1;
-
-    for (int i = 1; i <= n; ++i) {
-        for (int j = 1; j <= i; ++j) {
-            arr[i] += arr[j - 1] * arr[j - i];
+    for (int i = 0; i < k; ++i) {
+        if (x == 0) break;
+        
+        int banknote = arr[i];
+        if (banknote <= x) {
+            int count = x / banknote;
+            output += count;
+            x %= banknote;
         }
     }
-
-    return arr[n];
+    
+    if (x == 0) {
+        return output;
+    }
+    else {
+        std::cout << "не вышло: "; return -1;
+    }
+    
 }
 
 
 int main(){
-    std::cout << ex2(2) << std::endl;
-    
-    std::cout << ex2(3) << std::endl;
-    
-    std::cout << ex2(4) << std::endl;
-    
-    std::cout << ex2(20) << std::endl;
-    
-    std::cout << ex2(21) << std::endl;
-    
+    std::cout << "1. " << swans_greed(130, 4, {10, 3, 40, 1}) << std::endl;
+    std::cout << "2. " << swans_greed(100, 2, {7, 5}) << std::endl;
+    std::cout << "3. " << swans_greed(1, 1, {1}) << std::endl;
     return 0;
 }

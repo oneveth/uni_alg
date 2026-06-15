@@ -10,47 +10,43 @@
 #include <memory>
 #include <algorithm>
 #include <climits>
+#include <utility>
+#include <vector>
 
-class TreeNode{
-public:
-    
-    int val;
-    std::unique_ptr<TreeNode> left;
-    std::unique_ptr<TreeNode> right;
-
-    TreeNode(int val = 0, std::unique_ptr<TreeNode> left = nullptr, std::unique_ptr<TreeNode> right = nullptr)
-        : val(val), left(std::move(left)), right(std::move(right)) {}
-    
-};
-
-int turn_on_the_bright_lights(const std::unique_ptr<TreeNode>& node){
-    if (!node) {
-        return INT_MIN;
+std::pair<int,int> recursive(const std::vector<int>& arr, int l, int r){
+    if (l == r) {
+        return {arr[l], arr[l]};
     }
     
-    int left_max = turn_on_the_bright_lights(node->left);
-    int right_max = turn_on_the_bright_lights(node->right);
-    
-    return std::max({node->val, left_max, right_max});
+    if (r == l + 1) {
+        if (arr[l] < arr[r]) {
+            return {arr[l], arr[r]};
+        }
+        else {
+            return {arr[r], arr[l]};
+        }
+    }
+
+    int m = l + (r - l) / 2;
+
+    auto [left_min, left_max] = recursive(arr, l, m);
+    auto [right_min, right_max] = recursive(arr, m + 1, r);
+
+    return {std::min(left_min, right_min), std::max(left_max, right_max)};
 }
 
+std::pair<int,int> min_max_whatever(const std::vector<int>& arr){
+    return recursive(arr, 0, arr.size() - 1);
+}
 
-int main(int argc, const char * argv[]) {
-    auto root = std::make_unique<TreeNode>(1,
-            std::make_unique<TreeNode>(3,
-    std::make_unique<TreeNode>(8,
-std::make_unique<TreeNode>(14),
-    std::make_unique<TreeNode>(15) ),
-        std::make_unique<TreeNode>(10,
-                            nullptr,
-            std::make_unique<TreeNode>(3) ) ),
-                                                        std::make_unique<TreeNode>(5,
-                                                    std::make_unique<TreeNode>(2),
-                                                            std::make_unique<TreeNode>(6,
-                                                        std::make_unique<TreeNode>(0),
-                                                                std::make_unique<TreeNode>(1) ) ) );
+int main(){
     
+    std::vector<int> arr = {5, 7, 2, 4, 9, 6};
+
+    auto [min_val, max_val] = min_max_whatever(arr);
+
+    std::cout << "The minimum array element is " << min_val << std::endl;
+    std::cout << "The maximum array element is " << max_val << std::endl;
     
-    std::cout << turn_on_the_bright_lights(root) << std::endl;
     return 0;
 }
